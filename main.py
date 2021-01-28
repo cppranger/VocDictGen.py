@@ -1,9 +1,13 @@
 from randomnames import *
 from tkinter import *
+from tkinter import messagebox
+import datetime
 import random
 import functools
+import os
 import countries
 import states
+import month
 
 
 def task(number):
@@ -11,7 +15,7 @@ def task(number):
     result = ''
     for i, num in enumerate(number):
         if i % 3 == 0:
-            result += '.'
+            result += ','
         result += num
     result = result[::-1][:-1]
     return result
@@ -80,48 +84,71 @@ def randPlace():
 
 
 def randRand():
-    rnd = random.randint(0, 3)
+    rnd = random.randint(0, 4)
     if rnd == 0:
         return randName()
     elif rnd == 1:
         return randNumber()
     elif rnd == 2:
         return randTel()
+    elif rnd == 3:
+        return randDate()
     else:
         return randPlace()
 
 
+def randDate():
+    rnd_month = random.randint(1, 12)
+    rnd_data = random.randint(1, month.numbs[rnd_month])
+    rnd_year = random.randint(1000, 3000)
+    return str(rnd_data) + ' ' + str(month.months[rnd_month]) + ' ' + str(rnd_year)
+
+
 def fileWriter(dictations=30, strs=30):
+    now = datetime.datetime.now()
     for i in range(0, dictations):
-        file = open("c:/lists/list[{}].txt".format(i + 1), "w")
-        print('File #{} successfully created!'.format(i + 1))
+        now_time = str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '-' + str(now.hour) + '-' + str(now.minute) + '-' + str(now.second) + '-#' + str(i+1)
+        file = open("c:/lists/list[{}].txt".format(now_time), "w", encoding='utf-8')
+        txt.insert(END, 'File #{} successfully created!\n'.format(i + 1))
         for y in range(0, strs):
             file.write(randRand() + '\n')
+    txt.insert(END, 'Successfully generated {} lists!\n'.format(dictations))
+    os.startfile("c:/lists/")
 
 
 def clicked():
-    fileWriter()
-    # if not dictat.get() or not lenlist.get() or dictat.get().isdigit() or not lenlist.get().isdigit():
-        # messagebox.showerror('Неверный тип!', 'Введите целое число')
-    # else:
-        # fileWriter(int(dictat.get()), int(lenlist.get()))
+
+    if not dictat.get() or not lenlist.get() or not dictat.get().isdecimal() or not lenlist.get().isdecimal():
+        messagebox.showerror('Неверный тип!', 'Введите целое число')
+    else:
+        fileWriter(int(dictat.get()), int(lenlist.get()))
 
 
 window = Tk()
-window.title("Vocabulary Dictation Generator")
+window.title("VocDictGen v0.5b")
 window.geometry('300x300')
+window.resizable(width=False, height=False)
 
 lbl = Label(window, text="This small app generates vocabulary dictations!")
-lbl.place(x=20, y=100)
+lbl.place(x=20, y=10)
 btn = Button(window, text="Generate!", command=clicked)
-btn.place(x=200, y=240)
+btn.place(x=220, y=250)
+txt = Text(window, width=33, height=10)
+scroll = Scrollbar(command=txt.yview)
+scroll.pack(side=LEFT, fill=Y)
+txt.config(yscrollcommand=scroll.set)
+txt.place(x=15, y=40)
+logo = Label(window, text="github: @cppranger")
+logo.place(x=105, y=270)
 
-# dictat_lbl = Label(window, text="Quantity of files: ")
-# dictat = Entry(window, width=10)
-# lenlist_lbl = Label(window, text="Quantity of list entries: ")
-# lenlist = Entry(window, width=10)
-# dictat.place(x=150, y=150)
-# dictat_lbl.place(x=20, y=150)
-# lenlist.place(x=150, y=180)
-# lenlist_lbl.place(x=20, y=180)
+dictat_lbl = Label(window, text="Quantity of files: ")
+dictat = Entry(window, width=21)
+dictat.insert(END, '5')
+lenlist_lbl = Label(window, text="Quantity of list entries: ")
+lenlist = Entry(window, width=21)
+lenlist.insert(END, '5')
+dictat.place(x=150, y=210)
+dictat_lbl.place(x=20, y=210)
+lenlist.place(x=150, y=230)
+lenlist_lbl.place(x=20, y=230)
 window.mainloop()
